@@ -4,6 +4,8 @@
 #include <cmath>
 #include <iostream>
 
+static inline float SquareFloat(const float& f) {return f*f;}
+
 namespace CMPUT350 {
 
 struct Point2D {
@@ -11,81 +13,94 @@ struct Point2D {
     Point2D(float x = 0, float y = 0) : x(x), y(y) {}
     double Distance(const Point2D &other) const {
         // TODO: write this code
-        return 0;
+        return sqrt(SquareFloat(x - other.x) + SquareFloat(y - other.y));
     }
     Point2D operator+(const Point2D &other) const {
         // TODO: write this code
-        return *this;
+        return Point2D(x + other.x, y + other.y);
+
     }
     Point2D operator+(const float &other) const {
         // TODO: write this code
-        return *this;
+        return Point2D(x + other, y+other);
     }
     Point2D operator-(const Point2D &other) const {
         // TODO: write this code
-        return *this;
+        return Point2D(x - other.x, y - other.y);
     }
     Point2D operator-(const float &other) const {
+        return Point2D(x - other, y - other);
         // TODO: write this code
-        return *this;
     }
     Point2D operator*(const float &scalar) const {
+        return Point2D(x * scalar, y * scalar);
         // TODO: write this code
-        return *this;
     }
     Point2D &operator+=(const float &scalar) {
         // TODO: write this code
+        x += scalar;
+        y += scalar;
         return *this;
     }
     Point2D &operator+=(const Point2D &other) {
         // TODO: write this code
+        x += other.x;
+        y += other.y;
         return *this;
     }
     Point2D &operator-=(const Point2D &other) {
         // TODO: write this code
+        x -= other.x;
+        y -= other.y;
         return *this;
     }
     bool operator==(const Point2D &other) const {
         // TODO: write this code
-        return false;
+        return (x == other.x && y == other.y);
     }
     Point2D &operator*=(const int &scalar) {
         // TODO: write this code
+        x *= scalar;
+        y *= scalar;
         return *this;
     }
     Point2D &operator/=(const int &scalar) {
         // TODO: write this code
+        x /= scalar;
+        y /= scalar;
         return *this;
     }
     float operator*(const Point2D &other) const {
         // TODO: write this code
-        return 0;
+        return (x * other.x) + (y * other.y);
     }
     float Dot(Point2D b) const {
         // TODO: write this code
-        return 0;
+        return (*this)*b;
     }
-    static float Dot(Point2D a, Point2D b) {
+    static float Dot(Point2D a, Point2D b) { // not needed until 1b
         // TODO: write this code
-        return 0;
+        return a*b;
     }
-    static float Cross(Point2D a, Point2D b) {
+    static float Cross(Point2D a, Point2D b) { // not needed until 1b
         // TODO: write this code
         return 0;
     }
     void Normalize() {
         // TODO: write this code
+        (*this) /= sqrt((Dot(*this))); // wonder if its faster to use the quake algorithm to approximate the inverse squre         
     }
 };
 
 static std::ostream &operator<<(std::ostream &os, const Point2D &p) {
     // TODO: write this code
+    // Gonna hold off on this since I don't know exactly how this should print.
     return os;
 }
 
 static Point2D operator*(float number, const Point2D &rhs) {
     // TODO: write this code
-    return rhs;
+    return Point2D(rhs.x * number, rhs.y * number);
 }
 
 struct Line {
@@ -95,7 +110,7 @@ struct Line {
     Line(float x1, float y1, float x2, float y2) : p1(x1, y1), p2(x2, y2) {}
     float Length() const {
         // TODO: write this code
-        return 0;
+        return p1.Distance(p2);
     }
     Point2D ClosestPoint(const Point2D &p) const {
         // TODO: write this code
@@ -157,11 +172,14 @@ struct Rect {
     }
     Rect &operator+=(const Point2D &other) {
         // TODO: write this code
+        topLeft += other; // changing the offset
         return *this;
     }
     Rect operator+(const Point2D &other) const {
         // TODO: write this code
-        return *this;
+        auto newRect = *this;
+        newRect.topLeft += other;
+        return newRect;
     }
     void Inset(int inset) {
         // TODO: write this code
