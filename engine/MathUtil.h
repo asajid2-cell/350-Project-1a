@@ -147,7 +147,7 @@ struct Rect {
     float width, height;
 
     Rect(float left, float top, float width, float height)
-        : topLeft(Point2D(top, left)), width(width), height(height) {}
+        : topLeft(Point2D(left, top)), width(width), height(height) {}
 
     Rect(Point2D tl = {0, 0}, int w = 0, int h = 0) : topLeft(tl), width(w), height(h) {}
 
@@ -173,7 +173,32 @@ struct Rect {
         return *this;
     }
     Rect &operator&=(const Rect &other) {
-        // TODO: write this code
+        // we calculate the shaded reigon of both rectangles overlap
+        // for a &= b; we mutate a so that it becomes the intersection of a and b
+        float left = topLeft.x;
+        float top = topLeft.y;
+        float right = topLeft.x + width;
+        float bottom = topLeft.y + height;
+
+        float otherleft = other.topLeft.x;
+        float othertop = other.topLeft.y;
+        float otherright = other.topLeft.x + other.width;
+        float otherbottom = other.topLeft.y + other.height;
+
+        float newleft = std::max(left,otherleft);
+        float newtop = std::max(top,othertop);
+        float newright = std::min(right,otherright);
+        float newbottom = std::min(bottom,otherbottom);
+        if (newright < newleft || newbottom < newtop){
+            width = 0;
+            height = 0;
+            return (*this);
+        }
+        topLeft.x = newleft;
+        topLeft.y = newtop;
+        width = newright - topLeft.x;
+        height = newbottom - topLeft.y;
+
         return *this;
     }
     Rect &operator+=(const Point2D &other) {
@@ -191,8 +216,14 @@ struct Rect {
         // TODO: write this code
     }
     bool IsInside(const Point2D &p) const {
-        // TODO: write this code
-        return false;
+        // Returns True if a box is inside another box else false
+        return (
+            p.x>= topLeft.x &&
+            p.x <= topLeft.x + width &&
+            p.y >= topLeft.y &&
+            p.y<= topLeft.y + height
+        )
+
     }
 };
 
