@@ -222,8 +222,7 @@ struct Rect {
             p.x <= topLeft.x + width &&
             p.y >= topLeft.y &&
             p.y<= topLeft.y + height
-        )
-
+        );
     }
 };
 
