@@ -167,11 +167,31 @@ struct Rect {
         return *this;
     }
     Rect &operator|=(const Point2D &other) {
-        // TODO: write this code
-        return *this;
+        // TODO: Same as above but we expand to include one point instead of a whole rectangle
+        float left = topLeft.x;
+        float top = topLeft.y;
+        float right = topLeft.x + width;
+        float bottom = topLeft.y + height;
+
+        float newleft = std::min(left,other.x);
+        float newtop = std::min(top,other.y);
+        float newright = std::max(right,other.x);
+        float newbottom = std::max(bottom, other.y);
+
+        topLeft.x = newleft;
+        topLeft.y = newtop;
+        width = newright - topLeft.x;
+        height = newbottom - topLeft.y;
+
+        return (*this);
     }
     Rect &operator|=(const Line &other) {
-        // TODO: write this code
+        // Makes a rectangle big enough to encompass our line
+        // if we have Rect r; and Point2D p; then r |= p; means we expand rectangle r so that p is inside of it.
+
+        *this |= other.p1; // expand to encompass point 1
+        *this |= other.p2; // expand to encompass point 2
+
         return *this;
     }
     Rect &operator&=(const Rect &other) {
@@ -213,7 +233,26 @@ struct Rect {
         return newRect;
     }
     void Inset(int inset) {
-        // TODO: write this code
+        // TODO: Shrinks the Rectangle inward from every side by the same amount
+
+        float left = topLeft.x;
+        float top = topLeft.y;
+
+        topLeft.x = left + inset;
+        topLeft.y = top + inset;
+        width = width - (2*inset);
+        height = height - (2*inset);
+
+        // This can return negative dimensions if inset is larger than 1/2 width or height. Potential edge case to consider later.
+
+        return;
+
+
+
+
+
+
+
     }
     bool IsInside(const Point2D &p) const {
         // Returns True if a box is inside another box else false
