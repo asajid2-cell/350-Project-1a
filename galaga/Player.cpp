@@ -21,6 +21,8 @@ void Player::LateUpdate(CMPUT350::GameContext* context)
 
 bool Player::HandleKeyEvent(CMPUT350::GameContext* context, char key)
 {
+    //TODO check if key is used by player and do action otherwise return false
+    return (false); // stubbed false for compilation
 }
 
 void Player::RenderBackground(CMPUT350::GameContext* context)
