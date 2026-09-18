@@ -12,74 +12,58 @@ struct Point2D {
     float x, y;
     Point2D(float x = 0, float y = 0) : x(x), y(y) {}
     double Distance(const Point2D &other) const {
-        // TODO: write this code
         return sqrt(SquareFloat(x - other.x) + SquareFloat(y - other.y));
     }
     Point2D operator+(const Point2D &other) const {
-        // TODO: write this code
         return Point2D(x + other.x, y + other.y);
-
     }
     Point2D operator+(const float &other) const {
-        // TODO: write this code
         return Point2D(x + other, y+other);
     }
     Point2D operator-(const Point2D &other) const {
-        // TODO: write this code
         return Point2D(x - other.x, y - other.y);
     }
     Point2D operator-(const float &other) const {
         return Point2D(x - other, y - other);
-        // TODO: write this code
     }
     Point2D operator*(const float &scalar) const {
         return Point2D(x * scalar, y * scalar);
-        // TODO: write this code
     }
     Point2D &operator+=(const float &scalar) {
-        // TODO: write this code
         x += scalar;
         y += scalar;
         return *this;
     }
     Point2D &operator+=(const Point2D &other) {
-        // TODO: write this code
         x += other.x;
         y += other.y;
         return *this;
     }
     Point2D &operator-=(const Point2D &other) {
-        // TODO: write this code
         x -= other.x;
         y -= other.y;
         return *this;
     }
     bool operator==(const Point2D &other) const {
-        // TODO: write this code
         return (x == other.x && y == other.y);
     }
     Point2D &operator*=(const int &scalar) {
-        // TODO: write this code
         x *= scalar;
         y *= scalar;
         return *this;
     }
     Point2D &operator/=(float scalar) {  // int gets truncated and results in zeros/infinities, so we use float
-        // TODO: write this code
         x /= scalar;
         y /= scalar;
         return *this;
     }
     float operator*(const Point2D &other) const {
-        // TODO: write this code
         return (x * other.x) + (y * other.y);
     }
     float Dot(Point2D b) const {
-        // TODO: write this code
         return (*this)*b;
     }
     static float Dot(Point2D a, Point2D b) { // not needed until 1b
-        // TODO: write this code
         return a*b;
     }
     static float Cross(Point2D a, Point2D b) { // not needed until 1b
@@ -105,7 +89,6 @@ static std::ostream &operator<<(std::ostream &os, const Point2D &p) {
 }
 
 static Point2D operator*(float number, const Point2D &rhs) {
-    // TODO: write this code
     return Point2D(rhs.x * number, rhs.y * number);
 }
 
@@ -115,7 +98,6 @@ struct Line {
     Line(Point2D p1 = {0, 0}, Point2D p2 = {0, 0}) : p1(p1), p2(p2) {}
     Line(float x1, float y1, float x2, float y2) : p1(x1, y1), p2(x2, y2) {}
     float Length() const {
-        // TODO: write this code
         return p1.Distance(p2);
     }
     Point2D ClosestPoint(const Point2D &p) const {
@@ -202,12 +184,10 @@ struct Rect {
         return *this;
     }
     Rect &operator+=(const Point2D &other) {
-        // TODO: write this code
         topLeft += other; // changing the offset
         return *this;
     }
     Rect operator+(const Point2D &other) const {
-        // TODO: write this code
         auto newRect = *this;
         newRect += other;
         return newRect;
