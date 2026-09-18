@@ -64,7 +64,7 @@ struct Point2D {
         y *= scalar;
         return *this;
     }
-    Point2D &operator/=(const int &scalar) {
+    Point2D &operator/=(float scalar) {  // int gets truncated and results in zeros/infinities, so we use float
         // TODO: write this code
         x /= scalar;
         y /= scalar;
@@ -87,8 +87,14 @@ struct Point2D {
         return 0;
     }
     void Normalize() {
-        // TODO: write this code
-        (*this) /= sqrt((Dot(*this))); // wonder if its faster to use the quake algorithm to approximate the inverse squre         
+        // Normalizes a given distance
+       float lengthsquared = ((Dot(*this)));
+       if (lengthsquared != 0.0f){
+          float inverse = 1 / sqrt(lengthsquared);
+          x *= inverse;
+          y *= inverse;
+       }
+        // We use the idea from quake by finding the squared length, checking for the zero edge case, then using the inverse once to find the scale factor needed to normalize both x and y
     }
 };
 
