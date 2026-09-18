@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <system_error>
 
 static inline float SquareFloat(const float& f) {return f*f;}
 
@@ -101,8 +102,28 @@ struct Line {
         return p1.Distance(p2);
     }
     Point2D ClosestPoint(const Point2D &p) const {
-        // TODO: write this code
-        return p;
+        // TODO: Finds the closest point
+
+        Point2D direction = p2-p1;
+        Point2D toPoint = p - p1;
+        float lengthSquared = direction.Dot(direction); // guard against divide by 0
+        if (lengthSquared == 0.0f) {
+            return p1;
+        }
+
+        float projected = toPoint.Dot(direction);
+        projected = projected / lengthSquared;
+
+        if (projected < 0.0f){
+            projected = 0.0f;
+        }
+        else if (projected > 1.0f){
+             projected = 1.0f;
+        }
+
+        Point2D closest = p1 + (projected*direction);
+
+        return closest;
     }
     bool Crosses(Line other, Point2D &crossingPoint) const {
         // TODO: write this code
