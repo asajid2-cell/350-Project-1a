@@ -178,7 +178,7 @@ struct Rect {
     Rect operator+(const Point2D &other) const {
         // TODO: write this code
         auto newRect = *this;
-        newRect.topLeft += other;
+        newRect += other;
         return newRect;
     }
     void Inset(int inset) {
