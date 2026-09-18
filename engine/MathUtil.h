@@ -143,7 +143,27 @@ struct Rect {
         : topLeft(center.x - radius, center.y - radius), width(2 * radius), height(2 * radius) {}
 
     Rect &operator|=(const Rect &other) {
-        // TODO: write this code
+        // TODO: Almost identical but swap max and min for top and bottom
+        float left = topLeft.x;
+        float top = topLeft.y;
+        float right = topLeft.x + width;
+        float bottom = topLeft.y + height;
+
+        float otherleft = other.topLeft.x;
+        float othertop = other.topLeft.y;
+        float otherright = other.topLeft.x + other.width;
+        float otherbottom = other.topLeft.y + other.height;
+
+        float newleft = std::min(left, otherleft);
+        float newtop = std::min(top, othertop);
+        float newright = std::max(right, otherright);
+        float newbottom = std::max(bottom, otherbottom);
+
+        topLeft.x = newleft;
+        topLeft.y = newtop;
+        width = newright - topLeft.x;
+        height = newbottom - topLeft.y;
+
         return *this;
     }
     Rect &operator|=(const Point2D &other) {
