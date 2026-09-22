@@ -2,6 +2,7 @@
 #define GRAPHICS_OBJECT_H
 
 #include "GameObject.h"
+#include <SFML/Graphics.hpp>
 
 namespace CMPUT350 {
 
@@ -11,6 +12,8 @@ class GraphicsObject : public GameObject {
 public:
     virtual void RenderBackground(GameContext *context);
     virtual void RenderForeground(GameContext *context);
+
+private:
 };
 
 }  // namespace CMPUT350
