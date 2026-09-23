@@ -1,10 +1,14 @@
 #include "GameEngine.h"
+#include "GameContext.h"
+#include "DrawContext.h"
+#include "GraphicsObject.h"
 
 /// @brief
 namespace CMPUT350 {
 #include "FontData.h"
 
-GameEngine::GameEngine(unsigned int width, unsigned int height, const std::string& name) {
+GameEngine::GameEngine(unsigned int width, unsigned int height, const std::string& name) 
+: mWindow(std::make_shared<sf::RenderWindow>(sf::VideoMode({width,height}), name)){
     // Sample font loading code
     //	if (!mFont->openFromMemory(&_font, _font_len))
     //	{
@@ -17,7 +21,9 @@ GameEngine::~GameEngine() {
     // mWindow->close();
 }
 
-void GameEngine::AddGameObject(std::shared_ptr<GameObject> gameObject) {}
+void GameEngine::AddGameObject(std::shared_ptr<GameObject> gameObject) {
+    mGameObjects.push_back(gameObject);
+}
 
 /**
  * @method Run
@@ -26,6 +32,11 @@ void GameEngine::AddGameObject(std::shared_ptr<GameObject> gameObject) {}
  * all objects have been destroyed.
  */
 void GameEngine::Run() {
+    GameContext context;
+    context.mEngineView = this;
+    DrawContext ctx = DrawContext(mWindow, nullptr);
+    context.ScreenContext = &ctx;
+
     while (true)  // window is open
     {
         // 0. Remove any objects that are now dead
@@ -35,6 +46,7 @@ void GameEngine::Run() {
         // 2. Process events
 
         // 3. Update game objects
+        for (auto& obj : mGameObjects) obj->Update(&context);
 
         // 4. Process collision events
 
@@ -45,6 +57,13 @@ void GameEngine::Run() {
         // 6. Render background
 
         // 7. Render foreground
+
+        for (auto& obj : mGameObjects) {
+            if (std::shared_ptr<CMPUT350::GraphicsObject> ptr = std::dynamic_pointer_cast<GraphicsObject>(obj)) {
+                ptr->RenderForeground(&context); // the spec says we can just do this
+                                        // even though this is probably dogsh*t for performance.
+            }
+        }
 
         // Actually render to window
     }
