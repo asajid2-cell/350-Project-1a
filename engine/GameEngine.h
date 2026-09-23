@@ -32,7 +32,11 @@ public:
 private:
     	std::shared_ptr<sf::RenderWindow> mWindow;
     	std::shared_ptr<sf::Font> mFont;
-    std::vector<std::shared_ptr<GameObject>> mGameObjects;
+        std::vector<std::shared_ptr<GameObject>> mGameObjects;
+
+        bool mCloseGame;
+
+        inline void PollWindow();
 };
 
 }  // namespace CMPUT350

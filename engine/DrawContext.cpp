@@ -21,14 +21,6 @@ void DrawContext::DrawText(const std::string &text, int pixelSize, Point2D p, RG
 }
 
 void DrawContext::DrawCircle(Point2D p, float radius, RGBColor c) {
-    /*
-    Let me use this function to illustrate my confusion:
-    When we write Galaga, suppose we have a BulletObject that takes the shape of a circle.
-    Exactly how are we supposed to use this function? We need the actual sf::Shape stored somewhere for when we 
-    want toe bullet to change positions. The point of DrawContext is so that Galaga doesnt have to worry about sfml. But 
-    I'm not sure what DrawContext is supposed to accomplish if the draw functions DONT return an sf::Shape to assign to a GraphicsObject.
-    
-    */
 
     sf::CircleShape circle(radius); // FIXME: Should probably throw some error if the radius is 0.
 
