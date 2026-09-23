@@ -32,10 +32,10 @@ void GameEngine::AddGameObject(std::shared_ptr<GameObject> gameObject) {
  * all objects have been destroyed.
  */
 void GameEngine::Run() {
-    GameContext context;
-    context.mEngineView = this;
-    DrawContext ctx = DrawContext(mWindow, nullptr);
-    context.ScreenContext = &ctx;
+    GameContext ctx;
+    ctx.mEngineView = this;
+    DrawContext drawCtx = DrawContext(mWindow, nullptr); // placeholder w/ the nullptr
+    ctx.ScreenContext = &drawCtx;
 
     while (true)  // window is open
     {
@@ -46,7 +46,7 @@ void GameEngine::Run() {
         // 2. Process events
 
         // 3. Update game objects
-        for (auto& obj : mGameObjects) obj->Update(&context);
+        for (auto& obj : mGameObjects) obj->Update(&ctx);
 
         // 4. Process collision events
 
@@ -60,7 +60,7 @@ void GameEngine::Run() {
 
         for (auto& obj : mGameObjects) {
             if (std::shared_ptr<CMPUT350::GraphicsObject> ptr = std::dynamic_pointer_cast<GraphicsObject>(obj)) {
-                ptr->RenderForeground(&context); // the spec says we can just do this
+                ptr->RenderForeground(&ctx); // the spec says we can just do this
                                         // even though this is probably dogsh*t for performance.
             }
         }
