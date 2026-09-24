@@ -44,7 +44,7 @@ inline void GameEngine::ProcessCollisions() {
                     if (std::shared_ptr<CMPUT350::CollisionObject> scd_ptr = std::dynamic_pointer_cast<CollisionObject>(*second_obj_it)) {
 
                         col_ptr->CollisionEnter(scd_ptr); // compare it with every (collision) object that comes after it in the vector
-                        scd_ptr->CollisionEnter(col_ptr); // gotta do it both ways too.
+                        scd_ptr->CollisionEnter(col_ptr); // actually not 100% of this needs to be done both ways.
 
                     }
                 }
