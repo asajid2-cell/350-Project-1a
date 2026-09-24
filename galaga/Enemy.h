@@ -25,6 +25,11 @@ public:
     // Collision Object Functions
     void CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject>& obj) override;
     const CMPUT350::Rect& GetBounds() override;
+
+private:
+    CMPUT350::Point2D mLocation; // the centre of the enemy, as the spec defines it
+    bool mAlive;
+    CMPUT350::Rect mBounds; // enemies never move, so this is set once and reused for both collisions and drawing
 };
 
 
