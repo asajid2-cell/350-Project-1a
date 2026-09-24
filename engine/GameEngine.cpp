@@ -60,7 +60,7 @@ GameEngine::~GameEngine() {
 }
 
 void GameEngine::AddGameObject(std::shared_ptr<GameObject> gameObject) {
-    mGameObjects.push_back(gameObject);
+    mLateGameObjects.push_back(gameObject);
 }
 
 /**
@@ -88,6 +88,9 @@ void GameEngine::Run() {
         // 0. Remove any objects that are now dead
 
         // 1. Activate and initialize any objects added during the last frame
+        mGameObjects.reserve(mGameObjects.size() + mLateGameObjects.size());
+        mGameObjects.insert(mGameObjects.end(), std::make_move_iterator(mLateGameObjects.begin()), std::make_move_iterator(mLateGameObjects.end()));
+        mLateGameObjects.clear();
 
         // 2. Process events
         PollWindow();
