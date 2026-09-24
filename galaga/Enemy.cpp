@@ -2,7 +2,7 @@
 #include "Bullet.h"
 
 Enemy::Enemy(CMPUT350::Point2D loc)
-    : mLocation(loc), mAlive(true)
+    : mAlive(true)
 {
     // Make a 40×40 rectangle whose center is at the given loc
     mBounds = CMPUT350::Rect(loc - CMPUT350::Point2D(20.0f, 20.0f), 40.0f, 40.0f);

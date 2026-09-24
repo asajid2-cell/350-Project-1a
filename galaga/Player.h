@@ -1,6 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "Bullet.h"
 #include "CollisionObject.h"
 
 class Player : public CMPUT350::CollisionObject
@@ -25,6 +26,13 @@ public:
     void CollisionEnter(const std::shared_ptr<CMPUT350::CollisionObject>& obj) override;
     const CMPUT350::Rect& GetBounds() override;
 
+private:
+    void Fire(CMPUT350::GameContext* context);
+    void ClampToScreen(CMPUT350::GameContext* context);
+
+    CMPUT350::Point2D mLocation;         // the player's centre
+    std::weak_ptr<Bullet> mBullets[2];   // the player watches the two shots the engine owns; an empty slot is a free one
+    CMPUT350::Rect mBounds;              // GetBounds returns a reference, so something has to own the rectangle
 };
 
 #endif
