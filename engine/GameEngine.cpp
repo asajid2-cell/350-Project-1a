@@ -81,7 +81,7 @@ void GameEngine::Run() {
         for (auto& obj : mGameObjects) {
             std::shared_ptr<CMPUT350::GraphicsObject> ptr = std::dynamic_pointer_cast<GraphicsObject>(obj);
             ptr->RenderBackground(&ctx); // the spec says we can just do this
-         // even though this is probably dogsh*t for performance.
+         // even though this is probably bad for performance.
         }
 
         // 7. Render foreground

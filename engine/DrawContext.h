@@ -41,6 +41,10 @@ public:
     int GetWindowHeight();
 
 private:
+
+    inline sf::Text GetSfText(const std::string &text, int pixelSize, Point2D p, RGBColor c);
+
+
     std::shared_ptr<sf::RenderWindow> mWindow;
     std::shared_ptr<sf::Font> mFont;
 };

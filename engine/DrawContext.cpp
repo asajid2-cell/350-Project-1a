@@ -13,19 +13,42 @@ static inline sf::Color GetSfColor(const CMPUT350::RGBColor& c) {
 
 namespace CMPUT350 {
 
+
 DrawContext::DrawContext(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<sf::Font> font)
     : mWindow(window), mFont(font) {}
 
+
+inline sf::Text DrawContext::GetSfText(const std::string &text, int pixelSize, Point2D p,RGBColor c) {
+
+    sf::Text my_text(*mFont, text, pixelSize);
+    my_text.setFillColor(sf::Color(c.r,c.g,c.b));
+    my_text.setPosition(sf::Vector2f(p.x,p.y));
+    return my_text;
+
+}
+
 void DrawContext::DrawCenteredText(const std::string &text, int pixelSize, Point2D p, RGBColor c) {
+
+
+    auto my_text = GetSfText(text, pixelSize, p, c);
+    auto text_bounding_box = my_text.getLocalBounds();
+
+    my_text.setOrigin(text_bounding_box.position + (text_bounding_box.size / 2.0f));
+    // The texts local coordinate system goes beyoned an sf::Text's bounding box.
+    // The origin of an sf::Text WILL (by default) be (0,0)
+    // But that marks the origin of an sf::Texts local origin coordinate system, not the top left corner of thebounding box
+    // So we have to offset FROM the top left of the bounding box to its center.
+
+
+    mWindow->draw(my_text);
+
+
 
 }
 
 void DrawContext::DrawText(const std::string &text, int pixelSize, Point2D p, RGBColor c) {
 
-    sf::Text my_text(*mFont, text, pixelSize);
-    my_text.setFillColor(sf::Color(c.r,c.g,c.b));
-    my_text.setPosition(sf::Vector2f(p.x,p.y));
-    mWindow->draw(my_text);
+     mWindow->draw(GetSfText(text, pixelSize, p, c));
 
 }
 
