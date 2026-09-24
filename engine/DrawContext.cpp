@@ -2,6 +2,15 @@
 #include <SFML/Graphics.hpp>
 
 
+static inline sf::Vector2f GetSfVec(const CMPUT350::Point2D& pnt) {
+    return sf::Vector2f(pnt.x,pnt.y);
+}
+
+static inline sf::Color GetSfColor(const CMPUT350::RGBColor& c) {
+    return sf::Color(c.r,c.g,c.b);
+}
+
+
 namespace CMPUT350 {
 
 DrawContext::DrawContext(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<sf::Font> font)
@@ -61,6 +70,33 @@ void DrawContext::FrameRect(Rect r, float width, RGBColor c) {}
  * relative to the world offset and rendered onto the associated window.
  */
 void DrawContext::DrawLine(Point2D from, Point2D to, float width, RGBColor c) {
+
+    Point2D end((to.x - from.x),(from.y - to.y));
+    end.Normalize();
+    end*=(width/2); // perpendicular vector that goes to each vertex of the rectangle.
+
+    sf::ConvexShape line;
+
+    auto relative = to - from; // vector from 'from' to 'ti'
+
+    line.setPointCount(4);
+    
+    line.setPoint(0, GetSfVec( end));
+    line.setPoint(1, GetSfVec(relative + end));
+
+    line.setPoint(2, GetSfVec(relative - end));
+    line.setPoint(3, GetSfVec(end * -1));
+
+    line.setFillColor(GetSfColor(c));
+    line.setPosition(GetSfVec(from));
+
+    mWindow->draw(line);
+
+
+
+    
+
+
 
 
 
