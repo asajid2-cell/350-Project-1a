@@ -79,9 +79,9 @@ public:
 
     const CMPUT350::Rect& GetBounds() override
     {
-        static CMPUT350::Rect bounds({0, 0}, 0, 0); // Initialize with dummy values
-        bounds = CMPUT350::Rect(mLoc - mRadius, 2 * mRadius, 2 * mRadius);
-        return bounds;
+        // A static here would be shared by every Ball, so each ball keeps its own box
+        mBounds = CMPUT350::Rect(mLoc - mRadius, 2 * mRadius, 2 * mRadius);
+        return mBounds;
     }
 
     bool IsAlive() const override
@@ -103,6 +103,7 @@ private:
 
     int mRadius, mNumCollisions, mFrameCollisions;
     CMPUT350::Point2D mLoc, mSpeed, mSpeedNext, mCollisionPoint;
+    CMPUT350::Rect mBounds;
 };
 
 // Shared randoms across all balls

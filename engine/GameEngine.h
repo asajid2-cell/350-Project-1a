@@ -14,6 +14,7 @@ class GameEngine;
 namespace CMPUT350 {
 
 class DrawContext;
+class GameContext;
 
 class GameEngine : public EngineView {
 public:
@@ -37,7 +38,7 @@ private:
 
         bool mCloseGame;
 
-        inline void PollWindow();
+        inline void PollWindow(GameContext* context);
         inline void ProcessCollisions();
 };
 

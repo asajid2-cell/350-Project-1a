@@ -8,7 +8,7 @@
 namespace CMPUT350 {
 #include "FontData.h"
 
-GameEngine::GameEngine(unsigned int width, unsigned int height, const std::string& name) 
+GameEngine::GameEngine(unsigned int width, unsigned int height, const std::string& name)
 : mWindow(std::make_shared<sf::RenderWindow>(sf::VideoMode({width,height}), name)),
  mFont(std::make_shared<sf::Font>()), mCloseGame(false) {
     // Sample font loading code
@@ -18,48 +18,76 @@ GameEngine::GameEngine(unsigned int width, unsigned int height, const std::strin
     	}
 }
 
-inline void GameEngine::PollWindow() {
-{
+inline void GameEngine::PollWindow(GameContext* context) {
 	while (const std::optional event = mWindow->pollEvent())
 	{
-        mCloseGame = event->is<sf::Event::Closed>();
-		if (event->is<sf::Event::Resized>())
+		if (event->is<sf::Event::Closed>())
+		{
+			mCloseGame = true; // latched, since a later event must not clear it
+		}
+		else if (event->is<sf::Event::Resized>())
 		{
 		}
 		else if (const auto* keyPressed = event->getIf<sf::Event::TextEntered>())
 		{
-			// use keyPressed->unicode to get character
+			// we only handle low-order ASCII, so the unicode value can come down to a char
+			char key = static_cast<char>(keyPressed->unicode);
+
+			// every object hears every key press, and decides for itself whether it cares
+			for (auto& obj : mGameObjects) obj->HandleKeyEvent(context, key);
 		}
 	}
- }
 }
 
 
+// True when two axis-aligned boxes share area, so boxes that only touch at an edge are not overlapping.
+// Four questions, all must be yes: does a start left of where b ends, does b start left of where a ends; both true means they interleave horizontally. Same for y. Interleave on both axes = overlapping areas.
+static bool Overlaps(const Rect& a, const Rect& b) {
+    return a.topLeft.x < b.topLeft.x + b.width &&
+           b.topLeft.x < a.topLeft.x + a.width &&
+           a.topLeft.y < b.topLeft.y + b.height &&
+           b.topLeft.y < a.topLeft.y + a.height;
+}
+
 inline void GameEngine::ProcessCollisions() {
-    for (auto it = mGameObjects.begin(); it != std::prev(mGameObjects.end()); ++it) { // for each game obj...
-        // iterators
-        // Worst case O(n^2) collision checking given n GameObjects 
+    // First figure out who can collide. Then check which pairs are actually touching.
 
-            if (std::shared_ptr<CMPUT350::CollisionObject> col_ptr = std::dynamic_pointer_cast<CollisionObject>(*it)) {
-                // if that game obj is a collision object...
+    // build a list containing only objects that are capable of collisions, so we have just the objects capable of collisions before we start comparing anything
+    std::vector<std::shared_ptr<CollisionObject>> colliders;
+    for (auto& obj : mGameObjects) {
+        // Try to treat this GameObject as a CollisionObject. If it really is one, col_ptr is valid and we keep it, if it isn't, the cast gives nullptr and we ignore it.
+        if (std::shared_ptr<CMPUT350::CollisionObject> col_ptr = std::dynamic_pointer_cast<CollisionObject>(obj)) {
+            colliders.push_back(col_ptr);
+        }
+    }
 
-                for (auto second_obj_it = std::next(it) ; second_obj_it != mGameObjects.end(); ++second_obj_it) {
-                    if (std::shared_ptr<CMPUT350::CollisionObject> scd_ptr = std::dynamic_pointer_cast<CollisionObject>(*second_obj_it)) {
-
-                        col_ptr->CollisionEnter(scd_ptr); // compare it with every (collision) object that comes after it in the vector
-                        scd_ptr->CollisionEnter(col_ptr); // actually not 100% of this needs to be done both ways.
-
-                    }
-                }
-
+    // Compare every collider against every OTHER collider exactly once.
+    //
+    // For example with A, B, C:
+    //
+    // i = A: check A-B, A-C
+    // i = B: check B-C
+    // i = C: nothing left
+    //
+    // We never check A-A and we never later repeat B-A.
+    for (size_t i = 0; i < colliders.size(); i++) {
+        // Starting at i + 1 means:
+        //   - don't collide an object with itself
+        //   - don't check the same pair twice
+        for (size_t j = i + 1; j < colliders.size(); j++) {
+            // Being CollisionObjects only means they CAN collide. Overlaps answers if their bounding boxes actually touching or overlapping
+            if (Overlaps(colliders[i]->GetBounds(), colliders[j]->GetBounds())) {
+                // If they are overlapping, tell BOTH objects about the same collision; The pair itself is checked only once, but each participant gets its own notification.
+                colliders[i]->CollisionEnter(colliders[j]);
+                colliders[j]->CollisionEnter(colliders[i]);
             }
         }
-
+    }
 }
 
 GameEngine::~GameEngine() {
-    // Cleanup resources
-    // mWindow->close();
+    // Run() can return while the window is still open, so close it here as a failsafe
+    mWindow->close();
 }
 
 void GameEngine::AddGameObject(std::shared_ptr<GameObject> gameObject) {
@@ -76,32 +104,39 @@ void GameEngine::Run() {
 
     GameContext ctx;
     ctx.mEngineView = this;
-    DrawContext drawCtx = DrawContext(mWindow, mFont); 
+    DrawContext drawCtx = DrawContext(mWindow, mFont);
     ctx.ScreenContext = &drawCtx;
 
     mWindow->setFramerateLimit(30); // Needed since physics are tied to the engine.
     // Not sure if this is supposed to be hardcoded or if the user sets it yet.
-    
+
 
     while (mWindow->isOpen())  // window is open
     {
 
-        
+
 
         // 0. Remove any objects that are now dead
         auto remove_inds = std::remove_if(mGameObjects.begin(),mGameObjects.end(), [](const std::shared_ptr<GameObject>& obj) -> bool {
             return !(obj->IsAlive());
-        }); 
+        });
 
         mGameObjects.erase(remove_inds, mGameObjects.end()); // if only we were on c++20
 
         // 1. Activate and initialize any objects added during the last frame
-        mGameObjects.reserve(mGameObjects.size() + mLateGameObjects.size());
+        size_t firstNew = mGameObjects.size();
+        // Make enough room before moving the waiting objects in.
+        mGameObjects.reserve(firstNew + mLateGameObjects.size());
+        // Move all objects from the queue into the real game-object list.
         mGameObjects.insert(mGameObjects.end(), std::make_move_iterator(mLateGameObjects.begin()), std::make_move_iterator(mLateGameObjects.end()));
+        // They're now in mGameObjects, so the queue is empty.
         mLateGameObjects.clear();
 
+        // Initialize ONLY the objects we just added. firstNew marks where the old objects stop and the new objects begin.
+        for (size_t i = firstNew; i < mGameObjects.size(); i++) mGameObjects[i]->Initialize(&ctx);
+
         // 2. Process events
-        PollWindow();
+        PollWindow(&ctx);
         if (mCloseGame) return;
 
         // 3. Update game objects
@@ -135,24 +170,5 @@ void GameEngine::Run() {
         mWindow->display();
     }
 }
-
-// Sample code for processing events
-
-// bool GameEngine::ProcessEvents(GameContext *context)
-//{
-//	while (const std::optional event = mWindow->pollEvent())
-//	{
-//		if (event->is<sf::Event::Closed>())
-//		{
-//		}
-//		else if (event->is<sf::Event::Resized>())
-//		{
-//		}
-//		else if (const auto* keyPressed = event->getIf<sf::Event::TextEntered>())
-//		{
-//			// use keyPressed->unicode to get character
-//		}
-//	}
-// }
 
 }  // namespace CMPUT350
