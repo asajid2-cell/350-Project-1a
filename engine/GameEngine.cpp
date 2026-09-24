@@ -46,10 +46,12 @@ void GameEngine::AddGameObject(std::shared_ptr<GameObject> gameObject) {
  * all objects have been destroyed.
  */
 void GameEngine::Run() {
+
     GameContext ctx;
     ctx.mEngineView = this;
-    DrawContext drawCtx = DrawContext(mWindow, mFont); // placeholder w/ the nullptr
-    ctx.ScreenContext = &drawCtx; 
+    DrawContext drawCtx = DrawContext(mWindow, mFont); 
+    ctx.ScreenContext = &drawCtx;
+
     mWindow->setFramerateLimit(30); // Needed since physics are tied to the engine.
     // Not sure if this is supposed to be hardcoded or if the user sets it yet.
     
@@ -79,16 +81,16 @@ void GameEngine::Run() {
 
         // 6. Render background
         for (auto& obj : mGameObjects) {
-            std::shared_ptr<CMPUT350::GraphicsObject> ptr = std::dynamic_pointer_cast<GraphicsObject>(obj);
-            ptr->RenderBackground(&ctx); // the spec says we can just do this
-         // even though this is probably bad for performance.
+            if (std::shared_ptr<CMPUT350::GraphicsObject> ptr = std::dynamic_pointer_cast<GraphicsObject>(obj)) {
+                ptr->RenderBackground(&ctx); }
+                // this is bad for performance but the spec said it's fine.
         }
 
         // 7. Render foreground
         for (auto& obj : mGameObjects) {
-            std::shared_ptr<CMPUT350::GraphicsObject> ptr = std::dynamic_pointer_cast<GraphicsObject>(obj);
-            ptr->RenderForeground(&ctx); 
-            
+            if (std::shared_ptr<CMPUT350::GraphicsObject> ptr = std::dynamic_pointer_cast<GraphicsObject>(obj)) {
+                ptr->RenderForeground(&ctx); }
+                // this is bad for performance but the spec said it's fine.
         }
 
 
