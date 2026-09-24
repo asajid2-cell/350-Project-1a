@@ -86,6 +86,11 @@ void GameEngine::Run() {
         
 
         // 0. Remove any objects that are now dead
+        auto remove_inds = std::remove_if(mGameObjects.begin(),mGameObjects.end(), [](const std::shared_ptr<GameObject>& obj) -> bool {
+            return !(obj->IsAlive());
+        }); 
+
+        mGameObjects.erase(remove_inds, mGameObjects.end()); // if only we were on c++20
 
         // 1. Activate and initialize any objects added during the last frame
         mGameObjects.reserve(mGameObjects.size() + mLateGameObjects.size());
