@@ -54,10 +54,17 @@ void DrawContext::DrawText(const std::string &text, int pixelSize, Point2D p, RG
 
 void DrawContext::DrawCircle(Point2D p, float radius, RGBColor c) {
 
-    sf::CircleShape circle(radius); // FIXME: Should probably throw some error if the radius is 0.
+    sf::CircleShape circle(radius); // FIXME: Should probably throw some exception if the radius is 0.
 
     circle.setPosition(sf::Vector2f(p.x, p.y));
     circle.setFillColor(sf::Color(c.r,c.g,c.b));
+
+    auto localBounds = circle.getLocalBounds();
+    auto new_origin = localBounds.position + (localBounds.size / 2.0f);
+    // Setting the origin as the center of the circle.
+    // Fixing this after implementing DrawCenterText
+
+    circle.setOrigin(new_origin);
 
     mWindow->draw(circle);
 
