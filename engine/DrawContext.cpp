@@ -101,16 +101,18 @@ void DrawContext::FrameRect(Rect r, float width, RGBColor c) {}
  */
 void DrawContext::DrawLine(Point2D from, Point2D to, float width, RGBColor c) {
 
-    Point2D end((to.x - from.x),(from.y - to.y));
+    // To get the vector pointing SIDEWAYS across the line, rotate that direction 90 degrees: (dx, dy) -> (-dy, dx)
+    // The old code used (dx, -dy), which only mirrored the direction instead of making it perpendicular. That produced a diamond shape instead of a proper rectangle.
+    Point2D end(-(to.y - from.y), (to.x - from.x));
     end.Normalize();
-    end*=(width/2); // perpendicular vector that goes to each vertex of the rectangle.
+    end = end * (width / 2.0f); // float multiply, since operator*= takes an int and would truncate thin lines away
 
     sf::ConvexShape line;
 
     auto relative = to - from; // vector from 'from' to 'ti'
 
     line.setPointCount(4);
-    
+
     line.setPoint(0, GetSfVec( end));
     line.setPoint(1, GetSfVec(relative + end));
 
@@ -124,7 +126,7 @@ void DrawContext::DrawLine(Point2D from, Point2D to, float width, RGBColor c) {
 
 
 
-    
+
 
 
 
