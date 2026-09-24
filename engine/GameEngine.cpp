@@ -19,16 +19,19 @@ GameEngine::GameEngine(unsigned int width, unsigned int height, const std::strin
 }
 
 inline void GameEngine::PollWindow() {
-    while (const std::optional<sf::Event> event = mWindow->pollEvent()) {
+{
+	while (const std::optional event = mWindow->pollEvent())
+	{
         mCloseGame = event->is<sf::Event::Closed>();
-    }
-
-    /*
-    pollEvent is for more than just processing inputs. It's needed to process any requests and events
-    the OS sends to it via the message queue. So not calling it (even if the game takes no input) leads
-    to the message queue being full of ignored requests from the OS. Eventually the OS will think that the program
-    is frozen.
-    */
+		if (event->is<sf::Event::Resized>())
+		{
+		}
+		else if (const auto* keyPressed = event->getIf<sf::Event::TextEntered>())
+		{
+			// use keyPressed->unicode to get character
+		}
+	}
+ }
 }
 
 
