@@ -2,6 +2,7 @@
 #include "GameContext.h"
 #include "DrawContext.h"
 #include "GraphicsObject.h"
+#include "CollisionObject.h"
 
 /// @brief
 namespace CMPUT350 {
@@ -28,6 +29,29 @@ inline void GameEngine::PollWindow() {
     to the message queue being full of ignored requests from the OS. Eventually the OS will think that the program
     is frozen.
     */
+}
+
+
+inline void GameEngine::ProcessCollisions() {
+    for (auto it = mGameObjects.begin(); it != std::prev(mGameObjects.end()); ++it) { // for each game obj...
+        // iterators
+        // Worst case O(n^2) collision checking given n GameObjects 
+
+            if (std::shared_ptr<CMPUT350::CollisionObject> col_ptr = std::dynamic_pointer_cast<CollisionObject>(*it)) {
+                // if that game obj is a collision object...
+
+                for (auto second_obj_it = std::next(it) ; second_obj_it != mGameObjects.end(); ++second_obj_it) {
+                    if (std::shared_ptr<CMPUT350::CollisionObject> scd_ptr = std::dynamic_pointer_cast<CollisionObject>(*second_obj_it)) {
+
+                        col_ptr->CollisionEnter(scd_ptr); // compare it with every (collision) object that comes after it in the vector
+                        scd_ptr->CollisionEnter(col_ptr); // gotta do it both ways too.
+
+                    }
+                }
+
+            }
+        }
+
 }
 
 GameEngine::~GameEngine() {
@@ -73,8 +97,10 @@ void GameEngine::Run() {
         for (auto& obj : mGameObjects) obj->Update(&ctx);
 
         // 4. Process collision events
+        ProcessCollisions();
 
         // 5. Late updates
+        for (auto& obj : mGameObjects) obj->LateUpdate(&ctx);
 
         // Clear window
         mWindow->clear();

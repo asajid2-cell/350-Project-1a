@@ -37,6 +37,7 @@ private:
         bool mCloseGame;
 
         inline void PollWindow();
+        inline void ProcessCollisions();
 };
 
 }  // namespace CMPUT350
