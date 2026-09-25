@@ -114,9 +114,10 @@ std::mt19937 Ball::gen(rd());
 
 int main()
 {
-    bool mBallSsample = true;
+    // The ball sample is the engine's own test, so the galaga scene is what runs by default
+    bool runBallSample = false;
 
-    if (mBallSsample)
+    if (runBallSample)
     {
         CMPUT350::GameEngine engine(1024, 768, "Ball Simulation");
         engine.AddGameObject(std::make_shared<Ball>(100));
@@ -129,10 +130,14 @@ int main()
         auto player = std::make_shared<Player>(CMPUT350::Point2D(768 / 2, 900));
         engine.AddGameObject(player);
         engine.AddGameObject(std::make_shared<Stars>(250, CMPUT350::Rect(0, 0, 768, 1024)));
-        for (int x = 0; x < 4; x++)
+        // 40 enemies evenly spread across the top. One row would be 1600px of enemy in a 768px window,
+        // so they form a grid: 8 columns 96 apart, 5 rows 60 apart, none of them overlapping.
+        for (int row = 0; row < 5; row++)
         {
-            auto enemy = std::make_shared<Enemy>(CMPUT350::Point2D(100 + x * 200, 100));
-            engine.AddGameObject(enemy);
+            for (int col = 0; col < 8; col++)
+            {
+                engine.AddGameObject(std::make_shared<Enemy>(CMPUT350::Point2D(48 + col * 96, 80 + row * 60)));
+            }
         }
         engine.Run();
     }
